@@ -8,4 +8,6 @@ cli
 cli.parse(process.argv);
 
 const options = cli.opts();
-if (options.test) console.log("Test");
+
+if ( Object.keys(options).length === 0 ) console.log("No options provided");
+if ( options.test ) console.log("Test");
