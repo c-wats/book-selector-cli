@@ -11,18 +11,12 @@ export const requestNumberOfBooks = async (): Promise<number> => {
           return userInput.toLowerCase();
         },
         validate(userInput) {
-          // todo check not an float
-          if (parseInt(userInput)) {
-            return true;
-          } else {
-            return "Must be a number";
-          }
+          return validateInt(userInput);
         }
       },
     ])
     .then(async (userInput) => {
-      const numberOfBooks: number = parseInt(userInput.numberOfBooks);
-      return numberOfBooks;
+      return parseInt(userInput.numberOfBooks);
     });
 }
 
@@ -35,9 +29,6 @@ export const requestBookTitles = async (numberOfBooks: number) => {
         type: "input",
         name: `bookTitle${i}`,
         message: `Title of book ${i} >`,
-        filter(userInput: string) {
-          return userInput.toLowerCase();
-        }
       });
   }
 
@@ -46,4 +37,52 @@ export const requestBookTitles = async (numberOfBooks: number) => {
     .then(async (parameters) => {
       return parameters;
     });
+}
+
+export const requestNumberOfAttendees = async (): Promise<number> => {
+  return inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "numberOfAttendees",
+        message: "Number of attendees > ",
+        filter(userInput) {
+          return userInput.toLowerCase();
+        },
+        validate(userInput) {
+          return validateInt(userInput);
+        }
+      },
+    ])
+    .then(async (userInput) => {
+      return parseInt(userInput.numberOfAttendees);
+    });
+}
+
+export const requestAttendeeNames = async (numberOfAttendees: number) => {
+  let promptsArray: object[] = [];
+
+  for (let i = 1; i <= numberOfAttendees; i++) {
+    promptsArray.push(
+      {
+        type: "input",
+        name: `attendee${i}`,
+        message: `Name ${i} >`,
+      });
+  }
+
+  return inquirer
+    .prompt(promptsArray)
+    .then(async (parameters) => {
+      return parameters;
+    });
+}
+
+const validateInt = (userInput: any): boolean | string => {
+  // todo - validate that number is not a float also
+  if (parseInt(userInput)) {
+    return true;
+  } else {
+    return "Must be a number";
+  }
 }
