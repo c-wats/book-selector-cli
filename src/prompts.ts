@@ -7,11 +7,8 @@ export const requestNumberOfBooks = async (): Promise<number> => {
         type: "input",
         name: "numberOfBooks",
         message: "Number of books to choose from > ",
-        filter(userInput) {
-          return userInput.toLowerCase();
-        },
         validate(userInput) {
-          return validateInt(userInput);
+          return (parseInt(userInput) && userInput > 1) ? true : "Must be a number and greater than 1";
         }
       },
     ])
@@ -29,6 +26,9 @@ export const requestBookTitles = async (numberOfBooks: number) => {
         type: "input",
         name: `bookTitle${i}`,
         message: `Title of book ${i} >`,
+        filter(userInput: string) {
+          return userInput.trimEnd();
+        }
       });
   }
 
@@ -46,11 +46,8 @@ export const requestNumberOfAttendees = async (): Promise<number> => {
         type: "input",
         name: "numberOfAttendees",
         message: "Number of attendees > ",
-        filter(userInput) {
-          return userInput.toLowerCase();
-        },
         validate(userInput) {
-          return validateInt(userInput);
+          return (parseInt(userInput) && userInput > 1) ? true : "Must be a number and greater than 1";
         }
       },
     ])
@@ -68,6 +65,9 @@ export const requestAttendeeNames = async (numberOfAttendees: number) => {
         type: "input",
         name: `attendee${i}`,
         message: `Name ${i} >`,
+        filter(userInput: string) {
+          return userInput.trimEnd();
+        }
       });
   }
 
@@ -78,11 +78,39 @@ export const requestAttendeeNames = async (numberOfAttendees: number) => {
     });
 }
 
-const validateInt = (userInput: any): boolean | string => {
-  // todo - validate that number is not a float also
-  if (parseInt(userInput)) {
-    return true;
-  } else {
-    return "Must be a number";
-  }
+export const requestBookRankingsPerAttendee = async (bookTitles: object, attendeeNames: object): Promise<object> => {
+  prettyPrintBookTitles(bookTitles);
+  const attendees = Object.values(attendeeNames);
+
+  let promptsArray: object[] = [];
+
+  attendees.forEach(attendee => {
+    promptsArray.push(
+      {
+        type: "input",
+        name: `${attendee}BookRanking`,
+        message: `Book ranking for ${attendee}: \n(please use the numbers assigned to each book and separate by a space) \n>`,
+        validate(userInput: string) {
+          // validate book ranking formatting
+          return true;
+        }
+      });
+  })
+
+  return inquirer
+    .prompt(promptsArray)
+    .then(async (parameters) => {
+      return parameters;
+    });
+}
+
+const prettyPrintBookTitles = (bookTitles: any) => {
+  console.log("Book Choices: ")
+  const books = Object.keys(bookTitles).sort();
+  const prettyBooks: string[] = books.map(book => {
+    return `${book.substring(9, 10)}. ${bookTitles[book]}`;
+  })
+  prettyBooks.forEach(book => {
+    console.log(book);
+  })
 }
